@@ -58,7 +58,7 @@ const FriendList = ({
               }}
               className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors cursor-pointer"
             >
-              <FriendCard user={friend} />
+              <FriendCard user={friend} currentUserId={currentUser._id} />
             </div>
           ))
         ) : (
