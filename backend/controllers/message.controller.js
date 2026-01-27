@@ -3,43 +3,44 @@ import Message from '../models/message.model.js';
 import { io as socket, getSocketIdFromUserId } from '../utils/socket.js'
 
 export const sendMessage = async (req, res) => {
-  try {
-    const { message_content } = req.body;
-    const { id: receiverId } = req.params; // Receiver's id
-    const senderId = req.user._id;
+   try {
+     const { message_content } = req.body;
+     const { id: receiverId } = req.params; // Receiver's id
+     const senderId = req.user._id;
 
-    let conversation = await Conversation.findOne({
-      members: { $all: [senderId, receiverId] },
-    });
+     let conversation = await Conversation.findOne({
+       members: { $all: [senderId, receiverId] },
+     });
 
-    if (!conversation) {
-      conversation = await Conversation.create({
-        members: [senderId, receiverId],
-      });
-    }
+     if (!conversation) {
+       conversation = await Conversation.create({
+         members: [senderId, receiverId],
+       });
+     }
 
-    const newMessage = await Message.create({
-      senderId,
-      receiverId,
-      message_content,
-    });
+     const newMessage = await Message.create({
+       senderId,
+       receiverId,
+       message_content,
+       isRead: false,
+     });
 
-    if (newMessage) {
-      conversation.messages.push(newMessage._id);
-    }
+     if (newMessage) {
+       conversation.messages.push(newMessage._id);
+     }
 
-    const reciverSid = getSocketIdFromUserId(receiverId);
-    if (reciverSid) {
-        socket.to(reciverSid).emit('newIncomingMessage', newMessage);
-    }
+     const reciverSid = getSocketIdFromUserId(receiverId);
+     if (reciverSid) {
+         socket.to(reciverSid).emit('newIncomingMessage', newMessage);
+     }
 
-    await Promise.all([conversation.save(), newMessage.save()]);
+     await Promise.all([conversation.save(), newMessage.save()]);
 
-    res.status(201).json(newMessage);
-  } catch (error) {
-    console.error('Error in sendMessage controller: ', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+     res.status(201).json(newMessage);
+   } catch (error) {
+     console.error('Error in sendMessage controller: ', error.message);
+     res.status(500).json({ error: 'Internal Server Error' });
+   }
 };
 
 
@@ -76,22 +77,59 @@ export const deleteTheConversation = async (req, res) => {
 }
 
 export const getMessages = async (req, res) => {
-  try {
-    const { id: receiverId } = req.params; // Receiver's id
-    const senderId = req.user._id;
+   try {
+     const { id: receiverId } = req.params; // Receiver's id
+     const senderId = req.user._id;
 
-    const conversation = await Conversation.findOne({
-      members: { $all: [senderId, receiverId] },
-    }).populate('messages'); // populates with the objects instead of message ids.
+     const conversation = await Conversation.findOne({
+       members: { $all: [senderId, receiverId] },
+     }).populate('messages'); // populates with the objects instead of message ids.
 
-    if (!conversation) {
-      return res.status(200).json([]);
-    }
-    res.status(200).json(conversation.messages);
-  } catch (error) {
-    console.error('Error in getMessages controller: ', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+     if (!conversation) {
+       return res.status(200).json([]);
+     }
+     res.status(200).json(conversation.messages);
+   } catch (error) {
+     console.error('Error in getMessages controller: ', error.message);
+     res.status(500).json({ error: 'Internal Server Error' });
+   }
+};
+
+export const getUnreadMessages = async (req, res) => {
+   try {
+     const userId = req.user._id;
+
+     const unreadMessages = await Message.find({
+       receiverId: userId,
+       isRead: false,
+     }).populate('senderId', 'username fullName profilePic bio');
+
+     res.status(200).json(unreadMessages);
+   } catch (error) {
+     console.error('Error in getUnreadMessages controller: ', error.message);
+     res.status(500).json({ error: 'Internal Server Error' });
+   }
+};
+
+export const markMessagesAsRead = async (req, res) => {
+   try {
+     const { senderId } = req.body;
+     const userId = req.user._id;
+
+     await Message.updateMany(
+       {
+         senderId,
+         receiverId: userId,
+         isRead: false,
+       },
+       { isRead: true },
+     );
+
+     res.status(200).json({ message: 'Messages marked as read' });
+   } catch (error) {
+     console.error('Error in markMessagesAsRead controller: ', error.message);
+     res.status(500).json({ error: 'Internal Server Error' });
+   }
 };
 
 export const getMessage = async (req, res) => {

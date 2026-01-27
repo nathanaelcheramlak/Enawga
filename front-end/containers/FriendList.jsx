@@ -7,14 +7,15 @@ import ProfileCard from "@components/ProfileCard";
 import FriendCard from "@components/FriendCard";
 
 const FriendList = ({
-  friends,
-  theme,
-  handleClickedUser,
-  changeTheme,
-  handleNotification,
-  currentUser,
-  changeBack,
-}) => {
+   friends,
+   theme,
+   handleClickedUser,
+   changeTheme,
+   handleNotification,
+   currentUser,
+   changeBack,
+   unreadCount,
+ }) => {
   return (
     <div className="flex-[0.25] bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700 flex flex-col h-full min-w-0">
       {/* Header with Profile Card */}
@@ -24,6 +25,7 @@ const FriendList = ({
           changeTheme={changeTheme}
           handleNotification={handleNotification}
           currentUser={currentUser}
+          unreadCount={unreadCount}
         />
       </div>
 

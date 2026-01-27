@@ -13,19 +13,21 @@ import Error from '@containers/ErrorPage';
 import { fetchFriends } from '@utils/commonFunctions';
 
 const HomePage = () => {
-  const [theme, setTheme] = useState('dark');
-  const [isBack, setIsBack] = useState(true);
-  const [openNoti, setOpenNoti] = useState(false);
-  const [currentUser, setCurrentUser] = useState({});
-  const [friends, setFriends] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [clickedUser, setClickedUser] = useState(null);
-  const [unreadMessageList, setunreadMessageList] = useState([]);
+   const [theme, setTheme] = useState('dark');
+   const [isBack, setIsBack] = useState(true);
+   const [openNoti, setOpenNoti] = useState(false);
+   const [currentUser, setCurrentUser] = useState({});
+   const [friends, setFriends] = useState([]);
+   const [loading, setLoading] = useState(true);
+   const [clickedUser, setClickedUser] = useState(null);
+   const [unreadMessageList, setunreadMessageList] = useState([]);
+   const [unreadCount, setUnreadCount] = useState(0);
 
   const router = useRouter();
 
   const addNewUnreadMessage = (message) => {
     setunreadMessageList((prevUnreadMsg) => [message, ...prevUnreadMsg]);
+    setUnreadCount((prev) => prev + 1);
   };
 
   // read message
@@ -66,15 +68,8 @@ const HomePage = () => {
     fetchFriends(setFriends);
   }, []);
 
-  const handleMessageClick = async (message) => {
-    const toClickUserId = message?.senderId;
-
-    for (const friend of friends) {
-      if (toClickUserId === friend?._id) {
-        setClickedUser(friend);
-      }
-    }
-    removeUnreadMessage(message);
+  const handleMessageClick = async (user) => {
+    setClickedUser(user);
     handleNotification();
   };
 
@@ -89,6 +84,9 @@ const HomePage = () => {
 
   const handleNotification = () => {
     setOpenNoti((prev) => !prev);
+    if (openNoti) {
+      setUnreadCount(0);
+    }
   };
 
   const handleClickedUser = (user) => {
@@ -121,7 +119,6 @@ const HomePage = () => {
 
            {openNoti && (
              <NotificationList
-               messageList={unreadMessageList}
                handleMessageClick={handleMessageClick}
                handleNotification={handleNotification}
              />
@@ -135,6 +132,7 @@ const HomePage = () => {
                changeTheme={changeTheme}
                handleNotification={handleNotification}
                currentUser={currentUser}
+               unreadCount={unreadCount}
              />
              <ChatBox
                currentUser={currentUser}
@@ -153,6 +151,7 @@ const HomePage = () => {
                 handleNotification={handleNotification}
                 currentUser={currentUser}
                 changeBack={changeBack}
+                unreadCount={unreadCount}
               />
             ) : (
               <ChatBox

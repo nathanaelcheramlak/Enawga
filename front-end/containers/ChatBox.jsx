@@ -83,22 +83,26 @@ const ChatBox = ({
     });
 
     currentSocket.on('newIncomingMessage', (message) => {
-      if (currentUser?._id == message.receiverId) {
+      console.log('Received message:', message, 'Current user ID:', currentUser?._id, 'Clicked user ID:', clickedUser?._id);
+      
+      // Add message if it's from the currently chatting user
+      if (clickedUser && message.senderId === clickedUser._id) {
         setMessages((prevMessages) => [
           ...prevMessages,
           { ...message, message: message?.message_content, session: false },
         ]);
       }
-      unreadMessagesHandler(message);
+      
+      // Mark as unread if user is not chatting with this sender
+      if (!clickedUser || message.senderId !== clickedUser._id) {
+        unreadMessagesHandler(message);
+      }
     });
 
     return () => {
-      setMessages([]);
-      if (socket.current) {
-        disconnectSocket();
-      }
+      currentSocket.off('newIncomingMessage');
     };
-  }, []);
+  }, [clickedUser, currentUser, unreadMessagesHandler]);
 
   // Hook2: load the previous chat histroy whenever the clicked user is changed
   useEffect(() => {
@@ -137,10 +141,12 @@ const ChatBox = ({
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+      setTimeout(() => {
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
+      }, 0);
     }
-  });
+  }, [messages]);
 
   return (
     <div className="flex-[0.75] justify-between relative flex flex-col bg-slate-900 h-full min-w-0">

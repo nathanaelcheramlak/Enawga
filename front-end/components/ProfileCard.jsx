@@ -9,13 +9,14 @@ import Choice from "@components/Choice";
 import DefaultProfile from "@public/assets/default-profile-image.jpg";
 
 const ProfileCard = ({
-  user,
-  theme,
-  changeTheme,
-  changeBack,
-  handleNotification,
-  currentUser,
-}) => {
+   user,
+   theme,
+   changeTheme,
+   changeBack,
+   handleNotification,
+   currentUser,
+   unreadCount,
+ }) => {
   const [message, setMessage] = useState("");
 
   const onYes = async () => {};
@@ -96,16 +97,18 @@ const ProfileCard = ({
         {/* Right Section - Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {currentUser && (
-             <Button
-               onClick={handleNotification}
-               size="sm"
-               variant="ghost"
-               className="relative text-slate-400 hover:text-slate-200 hover:bg-slate-700"
-             >
-               <Bell className="h-5 w-5" />
-               <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
-             </Button>
-           )}
+            <Button
+              onClick={handleNotification}
+              size="sm"
+              variant="ghost"
+              className="relative text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+            >
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+              )}
+            </Button>
+          )}
 
            {!currentUser && (
             <Button
