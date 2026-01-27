@@ -17,7 +17,7 @@ const FriendCard = ({ user, currentUserId }) => {
     const fetchLastMessage = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/messages/user/${user._id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/messages/user/${user._id}`,
           {
             credentials: "include",
           }

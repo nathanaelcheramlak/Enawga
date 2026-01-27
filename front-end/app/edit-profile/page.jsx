@@ -36,7 +36,7 @@ const EditProfile = () => {
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/auth/verify?timestamp=${new Date().getTime()}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify?timestamp=${new Date().getTime()}`,
           {
             withCredentials: true,
           },
@@ -72,7 +72,7 @@ const EditProfile = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/users', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

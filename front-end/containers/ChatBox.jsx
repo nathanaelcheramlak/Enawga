@@ -45,7 +45,7 @@ const ChatBox = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/messages/send/${clickedUser._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/send/${clickedUser._id}`,
         {
           method: 'POST',
           credentials: 'include',
@@ -111,7 +111,7 @@ const ChatBox = ({
       const fetchConverstaion = async () => {
         try {
           const response = await fetch(
-            `http://localhost:5000/api/messages/user/${clickedUser._id}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/messages/user/${clickedUser._id}`,
             {
               credentials: 'include',
             },

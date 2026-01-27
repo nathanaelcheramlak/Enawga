@@ -20,7 +20,7 @@ const GOOGLE_SECRET = process.env.GOOGLE_SECRET;
 
 dotenv.config();
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow requests only from this origin
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Allow requests only from this origin
   credentials: true, // Enable cookies to be included in requests
   exposedHeaders: ['set-cookie'],
 };

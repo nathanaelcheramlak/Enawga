@@ -17,7 +17,7 @@ const SearchUsers = ({ setFriends }) => {
     const fetchUsers = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/search/user/${search}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/search/user/${search}`,
           {
             credentials: 'include',
           },
@@ -47,7 +47,7 @@ const SearchUsers = ({ setFriends }) => {
         .getElementById('loading-spinner')
         .classList.add('loading-spinner');
       const response = await fetch(
-        `http://localhost:5000/api/messages/send/${user._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/send/${user._id}`,
         {
           method: 'POST',
           credentials: 'include',

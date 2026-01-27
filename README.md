@@ -37,7 +37,9 @@ This project is a real-time chat application designed to enable users to join va
 
 ## Environment Variables
 
-To run this project, add a `.env` file in the root directory with the following environment variables:
+### Backend Setup
+
+Create a `.env` file in the `backend/` directory for local development:
 
 ```env
 PORT=5000
@@ -46,6 +48,27 @@ JWT_SECRET=<your_jwt_secret>
 NODE_ENV=development
 CLIENT_ID=<your_google_client_id>
 GOOGLE_SECRET=<your_google_secret>
+FRONTEND_URL=http://localhost:3000
+```
+
+For production on Render, set the `FRONTEND_URL` environment variable in your Render dashboard:
+
+```env
+FRONTEND_URL=https://enawga.vercel.app
+```
+
+### Frontend Setup
+
+Create a `.env.local` file in the `front-end/` directory for local development:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+For production on Vercel, update `.env.production` in `front-end/` with your Render backend URL:
+
+```env
+NEXT_PUBLIC_API_URL=https://enawga-backend.onrender.com
 ```
 
 # Installation

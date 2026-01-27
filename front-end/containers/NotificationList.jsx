@@ -13,7 +13,7 @@ const NotificationList = ({ handleNotification, handleMessageClick }) => {
   useEffect(() => {
     const fetchUnreadMessages = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/messages/unread", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/unread`, {
           credentials: "include",
         });
 
@@ -39,7 +39,7 @@ const NotificationList = ({ handleNotification, handleMessageClick }) => {
   const handleNotificationClick = async (message) => {
     try {
       // Mark messages as read
-      await fetch("http://localhost:5000/api/messages/read", {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/read`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

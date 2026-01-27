@@ -40,7 +40,7 @@ const Login = () => {
 
      try {
        const response = await fetch(
-         `http://localhost:5000/api/auth/login?rememberMe=${rememberMe}`,
+         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login?rememberMe=${rememberMe}`,
          {
            method: 'POST',
            headers: {
@@ -72,7 +72,7 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      window.location.href = 'http://localhost:5000/api/auth/google';
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
     } catch (error) {
       setError(error.message);
     }

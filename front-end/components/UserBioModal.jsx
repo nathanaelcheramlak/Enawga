@@ -17,7 +17,7 @@ const UserBioModal = ({ user, isOpen, onClose }) => {
         setIsLoading(true);
         try {
           const response = await fetch(
-            `http://localhost:5000/api/search/user/${user._id}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/search/user/${user._id}`,
             {
               credentials: "include",
             }
