@@ -1,83 +1,72 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
-import { User, Lock, Mail } from 'lucide-react';
+import { User, Lock } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Input } from '@components/ui/input';
 import { Button } from '@components/ui/button';
 import { Checkbox } from '@components/ui/checkbox';
 import { Alert, AlertDescription } from '@components/ui/alert';
+import { useAuthCheck } from '@hooks/useAuthCheck';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+   const [username, setUsername] = useState('');
+   const [password, setPassword] = useState('');
+   const [rememberMe, setRememberMe] = useState(true);
+   const [error, setError] = useState(null);
+   const [loading, setLoading] = useState(false);
+   const [isChecking, setIsChecking] = useState(true);
 
-  const router = useRouter();
+   // Check if user already has a valid JWT token on mount
+   useAuthCheck({
+     onSuccess: () => setIsChecking(false),
+     onFailure: () => setIsChecking(false),
+     successRedirect: '/home',
+   });
 
-  // Check if user already has a valid JWT token
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/auth/verify?timestamp=${new Date().getTime()}`,
-          {
-            withCredentials: true,
-          }
-        );
+  const handleLogin = async (e) => {
+     e?.preventDefault?.();
+     
+     if (!username || !password) {
+       setError('Username and password are required.');
+       return;
+     }
 
-        if (response.status === 200) {
-          // User is already authenticated, redirect to home
-          router.push('/home');
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-      } finally {
-        setIsChecking(false);
-      }
-    };
+     setError(null);
+     setLoading(true);
 
-    checkAuth();
-  }, [router]);
+     try {
+       const response = await fetch(
+         `http://localhost:5000/api/auth/login?rememberMe=${rememberMe}`,
+         {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+           },
+           body: JSON.stringify({ username, password }),
+           credentials: 'include',
+         },
+       );
 
-  const handleLogin = async () => {
-    if (!username || !password) {
-      setError('Username and password are required.');
-      return;
-    }
+       if (!response.ok) {
+         const errorData = await response.json().catch(() => ({}));
+         throw new Error(errorData.message || 'Login failed. Please check your credentials.');
+       }
 
-    setError(null);
-    setLoading(true);
+       router.push('/home');
+     } catch (error) {
+       setError(error.message);
+     } finally {
+       setLoading(false);
+     }
+   };
 
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/auth/login?rememberMe=${rememberMe}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-          credentials: 'include',
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error('Login failed. Please check your credentials.');
-      }
-
-      router.push('/home');
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+   const handleKeyDown = (e) => {
+     if (e.key === 'Enter' && !loading) {
+       handleLogin(e);
+     }
+   };
 
   const handleGoogleLogin = async () => {
     try {
@@ -135,6 +124,7 @@ const Login = () => {
                   placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
                   disabled={loading}
                 />
@@ -153,6 +143,7 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
                   disabled={loading}
                 />

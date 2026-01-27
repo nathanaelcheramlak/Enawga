@@ -1,7 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import { useState, useEffect, useCallback } from 'react';
 
 import FriendList from '@containers/FriendList';
 import ChatBox from '@containers/ChatBox';
@@ -11,6 +9,7 @@ import SearchUsers from '@containers/SearchUsers';
 import Error from '@containers/ErrorPage';
 
 import { fetchFriends } from '@utils/commonFunctions';
+import { useAuthCheck } from '@hooks/useAuthCheck';
 
 const HomePage = () => {
    const [theme, setTheme] = useState('dark');
@@ -23,46 +22,33 @@ const HomePage = () => {
    const [unreadMessageList, setunreadMessageList] = useState([]);
    const [unreadCount, setUnreadCount] = useState(0);
 
-  const router = useRouter();
-
-  const addNewUnreadMessage = (message) => {
-    setunreadMessageList((prevUnreadMsg) => [message, ...prevUnreadMsg]);
-    setUnreadCount((prev) => prev + 1);
-  };
-
-  // read message
-  const removeUnreadMessage = (message) => {
-    setunreadMessageList((prevUnreadMsg) =>
-      prevUnreadMsg.filter((p) => p?._id !== message?._id),
-    );
-  };
-
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/auth/verify?timestamp=${new Date().getTime()}`, // To prevent caching.
-          {
-            withCredentials: true,
-          },
-        );
-        if (response.status === 200) {
-          const data = response.data;
-          setCurrentUser(data.user);
-          setLoading(false);
-        } else {
-          setCurrentUser(null);
-          setLoading(false);
-        }
-      } catch (error) {
-        setCurrentUser(null);
-        setLoading(false);
-        console.error("Error while verifying token: ", error);
-      }
+    const addNewUnreadMessage = (message) => {
+      setunreadMessageList((prevUnreadMsg) => [message, ...prevUnreadMsg]);
+      setUnreadCount((prev) => prev + 1);
     };
 
-    fetchCurrentUser();
-  }, []);
+    // read message
+    const removeUnreadMessage = (message) => {
+      setunreadMessageList((prevUnreadMsg) =>
+        prevUnreadMsg.filter((p) => p?._id !== message?._id),
+      );
+    };
+
+    // Check if user has valid JWT token on mount
+    const handleAuthSuccess = useCallback((user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    }, []);
+
+    const handleAuthFailure = useCallback(() => {
+      setLoading(false);
+    }, []);
+
+    useAuthCheck({
+      onSuccess: handleAuthSuccess,
+      onFailure: handleAuthFailure,
+      failureRedirect: '/login',
+    });
 
   useEffect(() => {
     fetchFriends(setFriends);
