@@ -1,8 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
 import { FcGoogle } from 'react-icons/fc';
+import { User, Lock, Mail } from 'lucide-react';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
+import { Input } from '@components/ui/input';
+import { Button } from '@components/ui/button';
+import { Checkbox } from '@components/ui/checkbox';
+import { Alert, AlertDescription } from '@components/ui/alert';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -10,11 +16,36 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   const router = useRouter();
 
+  // Check if user already has a valid JWT token
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/auth/verify?timestamp=${new Date().getTime()}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.status === 200) {
+          // User is already authenticated, redirect to home
+          router.push('/home');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
   const handleLogin = async () => {
-    // Input validation
     if (!username || !password) {
       setError('Username and password are required.');
       return;
@@ -52,105 +83,138 @@ const Login = () => {
     try {
       window.location.href = 'http://localhost:5000/api/auth/google';
     } catch (error) {
-      setError(error);
+      setError(error.message);
     }
   };
 
+  // Show loading state while checking authentication
+  if (isChecking) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+          <p className="text-white text-center">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex gap-4 flex-col w-full justify-center items-center h-screen bg-[var(--box-color)]">
-      <div className="min-w-[300px] w-auto h-auto flex-column items-center gap-4 p-8 shadow-2xl rounded-lg">
-        <h1 className="font-bold tracking-wider text-xl lg:text-3xl">Login</h1>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+      <Card className="w-full max-w-md border border-slate-700 bg-slate-800 shadow-2xl">
+        <CardHeader className="space-y-2">
+          <CardTitle className="text-3xl font-bold text-center text-white">
+            Welcome Back
+          </CardTitle>
+          <p className="text-center text-slate-400 text-sm">
+            Sign in to your account to continue
+          </p>
+        </CardHeader>
 
-        {/* Username Input */}
-        <label className="input input-bordered flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            className="h-4 w-4 opacity-70"
-          >
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
-          </svg>
-          <input
-            type="text"
-            className="login-input-card"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </label>
+        <CardContent className="space-y-6">
+          {error && (
+            <Alert variant="destructive" className="bg-red-950 border-red-700">
+              <AlertDescription className="text-red-200">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
 
-        {/* Password Input */}
-        <label className="input input-bordered flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            className="h-4 w-4 opacity-70"
-          >
-            <path
-              fillRule="evenodd"
-              d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <input
-            type="password"
-            className="login-input-card"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+          <div className="space-y-4">
+            {/* Username Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-200">
+                Username
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Input
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={loading}
+                />
+              </div>
+            </div>
 
-        <div className="flex-column w-full h-auto px-2">
-          <div className="flex items-center gap-4 w-48 h-auto">
-            <span className="label-text">Remember me</span>
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              className="checkbox checkbox-primary"
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-200">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            {/* Remember Me */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={setRememberMe}
+                className="border-slate-600 bg-slate-700"
+              />
+              <label
+                htmlFor="remember"
+                className="text-sm font-medium text-slate-300 cursor-pointer"
+              >
+                Remember me
+              </label>
+            </div>
           </div>
 
-          <div className="text-xs font-light self-start mt-1">
-            Dont have an account?{' '}
-            <a className="underline text-xs" href="/signup">
+          {/* Login Button */}
+          <Button
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-10"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Button>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-600" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-slate-800 text-slate-400">or</span>
+            </div>
+          </div>
+
+          {/* Google Login */}
+          <Button
+            onClick={handleGoogleLogin}
+            variant="outline"
+            disabled={loading}
+            className="w-full bg-slate-700 border-slate-600 hover:bg-slate-600 text-white"
+          >
+            <FcGoogle className="mr-2 h-5 w-5" />
+            Sign in with Google
+          </Button>
+
+          {/* Sign Up Link */}
+          <p className="text-center text-sm text-slate-400">
+            Don&apos;t have an account?{' '}
+            <a href="/signup" className="text-blue-400 hover:text-blue-300 font-medium">
               Sign up
             </a>
-          </div>
-        </div>
-
-        <div className="w-full h-auto relative">
-          <hr className="w-full my-2 text-[var(--text-color)]" />
-          <div className="bg-[var(--box-color)] px-2 py-1 absolute -top-[8px] left-[45%]">
-            or
-          </div>
-
-          <div className="w-full flex justify-center my-4">
-            <button
-              className="px-3 py-1 bg-[var(--box-color-2)] rounded-sm hover:bg-[var(--hover-color)] flex items-center gap-3"
-              onClick={handleGoogleLogin}
-            >
-              <FcGoogle size={25} />
-              <div>Sign in with Google</div>
-            </button>
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {error && <p className="text-red-500">{error}</p>}
-
-        {/* Login Button */}
-        <button
-          className="px-8 py-2 bg-[var(--box-color-2)] hover:bg-[var(--hover-color)] rounded-sm"
-          onClick={handleLogin}
-          disabled={loading}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </div>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

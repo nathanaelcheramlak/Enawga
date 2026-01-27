@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    /* Custom theme variables */
     --background-color: linear-gradient(135deg, #121212 0%, #303030 100%);
     --box-color: #444;
     --box-color-2: #555;
@@ -13,6 +14,28 @@
     --text-color: #ffffff;
     --text-color-muted: #cfcfcf;
     --hover-color: #646464;
+    
+    /* shadcn/ui theme variables */
+    --border: 214 31.8% 91.4%;
+    --input: 214 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --radius: 0.5rem;
   }
 
   .light {
@@ -136,88 +159,4 @@
   @apply placeholder:text-[var(--text-color-muted)];
 }
 
-.animated-button {
-  @apply h-11 px-4 bg-blue-500 text-xl rounded-md cursor-pointer hover:bg-blue-700;
-}
 
-/* Animation styling */
-.animated-button:after {
-  content: "Get Started";
-  color: #ffffff;
-  animation: typing 3000ms steps(12) infinite,
-    blink 500ms step-end infinite alternate;
-}
-
-@keyframes typing {
-  0% {
-    content: "";
-  }
-  5% {
-    content: "G";
-  }
-  10% {
-    content: "Ge";
-  }
-  15% {
-    content: "Get";
-  }
-  20% {
-    content: "Get ";
-  }
-  25% {
-    content: "Get S";
-  }
-  30% {
-    content: "Get St";
-  }
-  35% {
-    content: "Get Sta";
-  }
-  40% {
-    content: "Get Star";
-  }
-  45% {
-    content: "Get Start";
-  }
-
-  50% {
-    content: "Get Started";
-  }
-
-  55% {
-    content: "Get Starte";
-  }
-  60% {
-    content: "Get Start";
-  }
-  65% {
-    content: "Get Star";
-  }
-  70% {
-    content: "Get Sta";
-  }
-  75% {
-    content: "Get St";
-  }
-  80% {
-    content: "Get S";
-  }
-  85% {
-    content: "Get ";
-  }
-  90% {
-    content: "Get";
-  }
-  95% {
-    content: "Ge";
-  }
-  100% {
-    content: "G";
-  }
-}
-
-@keyframes blink {
-  50% {
-    border-right: 2px solid #ffffff;
-  }
-}
