@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
 import { User, Lock } from 'lucide-react';
 
@@ -11,6 +12,7 @@ import { Alert, AlertDescription } from '@components/ui/alert';
 import { useAuthCheck } from '@hooks/useAuthCheck';
 
 const Login = () => {
+   const router = useRouter();
    const [username, setUsername] = useState('');
    const [password, setPassword] = useState('');
    const [rememberMe, setRememberMe] = useState(true);

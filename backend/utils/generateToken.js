@@ -11,7 +11,7 @@ const generateTokenAndSetCookie = (userId, res, expiresIn) => {
   res.cookie('jwt', token, {
     maxAge, // MS
     httpOnly: true, // Prevent XSS attacks (cross-site scripting attacks),
-    sameSite: 'strict', // CSRF attacks cross-site request forgery attacks
+    sameSite: 'lax', // CSRF attacks cross-site request forgery attacks
     secure: false,
   });
 };
