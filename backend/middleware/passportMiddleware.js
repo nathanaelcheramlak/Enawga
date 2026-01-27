@@ -6,6 +6,7 @@ dotenv.config();
 
 const clientId = process.env.CLIENT_ID;
 const googleSecret = process.env.GOOGLE_SECRET;
+const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
 
 // google authorization middleware
 passport.use(
@@ -13,7 +14,7 @@ passport.use(
     {
       clientID: clientId,
       clientSecret: googleSecret,
-      callbackURL: 'http://localhost:5000/api/auth/loggedIn',
+      callbackURL: `${backendUrl}/api/auth/loggedIn`,
     },
     (accessToken, refreshToken, profile, done) => {
       if (!accessToken) {
