@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { Search, X, MessageSquare, UserX } from 'lucide-react';
 
-import { IoSearchSharp } from 'react-icons/io5';
-import { IoArrowBack } from 'react-icons/io5';
-import { MdOutlineMessage } from 'react-icons/md';
-import { FaUserSlash } from 'react-icons/fa6';
-
-import { fetchFriends, sleep } from '@utils/commonFunctions';
+import { Input } from '@components/ui/input';
+import { Button } from '@components/ui/button';
+import { fetchFriends } from '@utils/commonFunctions';
 import DefaultProfile from '@public/assets/default-profile-image.jpg';
 
 const SearchUsers = ({ setFriends }) => {
@@ -85,89 +83,91 @@ const SearchUsers = ({ setFriends }) => {
   return (
     <div
       id="search_container"
-      className="hidden w-full h-full flex-center bg-black bg-opacity-60 z-20 fixed top-0 left-0"
+      className="hidden fixed inset-0 z-20 bg-black/60 flex items-center justify-center p-4"
     >
-      <div className="w-[85%] h-[85%] rounded-lg bg-[var(--box-color-2)]">
-        <div className="input-container">
-          <div className="h-full align-top py-2 mr-3">
-            <button
-              className="p-1 rounded-full hover:bg-[var(--box-color-2)]"
+      <div className="w-full max-w-2xl h-[85vh] rounded-lg bg-slate-800 border border-slate-700 shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="border-b border-slate-700 bg-slate-800/50 backdrop-blur p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Input
+                type="text"
+                placeholder="Search users..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500 h-10"
+                autoFocus
+              />
+            </div>
+            <Button
               onClick={() => {
                 document
                   .getElementById('search_container')
                   .classList.replace('fixed', 'hidden');
               }}
+              size="sm"
+              variant="ghost"
+              className="text-slate-400 hover:text-slate-200 hover:bg-slate-700"
             >
-              <IoArrowBack size={25} />
-            </button>
-          </div>
-
-          <div className="w-full flex gap-2 items-center">
-            <IoSearchSharp size={25} />
-            <input
-              type="text"
-              placeholder="Search Users"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="search-input"
-            />
+              <X className="h-5 w-5" />
+            </Button>
           </div>
         </div>
 
+        {/* Results */}
         {search.length > 0 ? (
-          <ul className="h-[650px] bg-[var(--box-color-3)] overflow-y-auto">
-            {users &&
+          <ul className="flex-1 overflow-y-auto">
+            {users && users.length > 0 ? (
               users.map((user, index) => (
-                <div key={index} className="hover:bg-[var(--box-color)]">
-                  <li className="py-3 px-6 flex-between">
-                    <div className="flex">
-                      <div className="w-[50px] h-[50px] mr-4">
+                <li
+                  key={index}
+                  className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors"
+                >
+                  <div className="px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                         <Image
-                          src={
-                            user.profilePic
-                              ? `${user.profilePic}`
-                              : DefaultProfile
-                          }
-                          alt="profile image"
-                          width={50}
-                          height={50}
-                          className="profile-image"
+                          src={user.profilePic || DefaultProfile}
+                          alt={user.username}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
                         />
                       </div>
 
-                      <div>
-                        <h2 className="font-semibold text-sm lg:text-lg">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-white truncate">
                           {user.username}
-                        </h2>
-                        <p className="text-[var(--text-color-muted)] leading-5">
+                        </h3>
+                        <p className="text-sm text-slate-400 truncate">
                           {user.fullName}
                         </p>
                       </div>
                     </div>
-                    <button
+                    <Button
                       onClick={() => handleMessageClick(user)}
-                      className="mr-14 p-1 rounded-md hover:bg-[var(--hover-color)]"
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0 ml-4"
                     >
-                      <MdOutlineMessage size={25} />
-                    </button>
-                  </li>
-                  <hr />
-                </div>
-              ))}
-          </ul>
-        ) : (
-          <div className="h-full flex-center items-center">
-            {search.length > 0 ? (
-              <div>
-                <FaUserSlash size={100} />
-                <h2>No users found</h2>
-              </div>
+                      <MessageSquare className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </li>
+              ))
             ) : (
-              <div>
-                <IoSearchSharp size={100} />
-                <h2>Search for users</h2>
+              <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                <UserX className="h-16 w-16 mb-4 opacity-50" />
+                <p className="text-lg font-medium">No users found</p>
+                <p className="text-sm">Try searching with a different name</p>
               </div>
             )}
+          </ul>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+            <Search className="h-16 w-16 mb-4 opacity-50" />
+            <p className="text-lg font-medium">Start searching</p>
+            <p className="text-sm">Search for users to start a conversation</p>
           </div>
         )}
       </div>

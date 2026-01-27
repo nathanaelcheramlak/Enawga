@@ -1,12 +1,9 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { Bell, ArrowLeft, Trash2 } from "lucide-react";
 
-import { IoIosSunny } from "react-icons/io";
-import { MdNightsStay } from "react-icons/md";
-import { IoIosNotificationsOutline } from "react-icons/io";
-import { IoArrowBack } from "react-icons/io5";
-
+import { Button } from "@components/ui/button";
 import { trim } from "@utils/commonFunctions";
 import Choice from "@components/Choice";
 import DefaultProfile from "@public/assets/default-profile-image.jpg";
@@ -39,89 +36,90 @@ const ProfileCard = ({
   };
 
   return (
-    <div className="flex-between py-4 px-3 bg-[var(--box-color-2)]">
+    <div className="border-b border-slate-700 bg-slate-800/50 backdrop-blur px-6 py-4">
       {message.length > 0 && (
         <Choice message={message} onYes={onYes} onNo={onNo} />
       )}
-      <div className="flex items-center gap-3 max-w-[500px]">
-        <div className="lg:hidden">
+      
+      <div className="flex items-center justify-between gap-4">
+        {/* Left Section - Back Button + Profile Info */}
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          {!currentUser && changeBack && (
+            <Button
+              onClick={changeBack}
+              size="sm"
+              variant="ghost"
+              className="lg:hidden text-slate-400 hover:text-slate-200 hover:bg-slate-700 flex-shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          )}
+
+          <div 
+            className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => {
+              document.getElementById('sidebar')?.dispatchEvent(
+                new CustomEvent('openSidebar')
+              );
+            }}
+          >
+            <Image
+              src={
+                currentUser?.profilePic
+                  ? `${currentUser.profilePic}`
+                  : user?.profilePic
+                  ? `${user.profilePic}`
+                  : DefaultProfile
+              }
+              alt="profile image"
+              width={48}
+              height={48}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
           {!currentUser && (
-            <i>
-              <IoArrowBack size={25} onClick={changeBack} />
-            </i>
+            <div className="min-w-0">
+              <h3 className="font-semibold text-white truncate">
+                {user.fullName}
+                <span className="ml-2 text-slate-400 font-normal text-sm">
+                  @{user.username}
+                </span>
+              </h3>
+              <p className="text-sm text-slate-400 truncate">
+                {user.bio && user.bio.length > 0 ? trim(user.bio) : "No bio"}
+              </p>
+            </div>
           )}
         </div>
-        <div>
-          <Image
-            src={
-              currentUser?.profilePic
-                ? `${currentUser.profilePic}`
-                : user?.profilePic
-                ? `${user.profilePic}`
-                : DefaultProfile
-            }
-            alt="profile image"
-            width={50}
-            height={50}
-            className={`profile-image ${
-              currentUser ? "peer hover:cursor-pointer" : ""
-            }`}
-            onClick={() => {
-              if (currentUser) {
-                document
-                  .getElementById("sidebar")
-                  .classList.replace("-left-[100%]", "left-0");
-              }
-            }}
-          />
+
+        {/* Right Section - Actions */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {currentUser && (
+             <Button
+               onClick={handleNotification}
+               size="sm"
+               variant="ghost"
+               className="relative text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+             >
+               <Bell className="h-5 w-5" />
+               <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+             </Button>
+           )}
+
+           {!currentUser && (
+            <Button
+              onClick={handleRemoveClicked}
+              size="sm"
+              variant="destructive"
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Remove</span>
+            </Button>
+          )}
         </div>
-
-        {!currentUser && (
-          <div className="flex-col">
-            <h2 className="font-semibold text-sm lg:text-lg">
-              {user.fullName}
-              <span className="ml-2 text-[var(--text-color-muted)] font-normal">
-                ({user.username})
-              </span>
-            </h2>
-            <p className="text-[var(--text-color-muted)] leading-5">
-              {user.bio.length > 0 ? trim(user.bio) : "No bio found"}
-            </p>
-          </div>
-        )}
       </div>
-
-      <div className="flex-between w-20">
-        {currentUser && (
-          <i className="relative" onClick={handleNotification}>
-            <IoIosNotificationsOutline size={25} />
-            <div className="bg-[var(--bubble-color)] w-2 h-2 rounded-full absolute top-[3px] right-[5px]"></div>
-          </i>
-        )}
-
-        {currentUser && (
-          <div>
-            {theme === "dark" ? (
-              <i onClick={changeTheme}>
-                <IoIosSunny size={25} />
-              </i>
-            ) : (
-              <i onClick={changeTheme}>
-                <MdNightsStay size={25} />
-              </i>
-            )}
-          </div>
-        )}
-      </div>
-
-      {!currentUser && (
-        <button
-          onClick={handleRemoveClicked}
-          className="px-4 py-1 mr-5 tracking-wide rounded-sm hover:bg-red-400"
-        >
-          remove friend
-        </button>
-      )}
     </div>
   );
 };

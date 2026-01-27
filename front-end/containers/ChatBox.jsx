@@ -143,7 +143,7 @@ const ChatBox = ({
   });
 
   return (
-    <div className="right-side justify-between relative flex flex-col bg-slate-900">
+    <div className="flex-[0.75] justify-between relative flex flex-col bg-slate-900 h-full min-w-0">
       {clickedUser ? (
         <>
           {/* Header */}

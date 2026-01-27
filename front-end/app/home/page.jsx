@@ -116,32 +116,32 @@ const HomePage = () => {
         </>
       ) : (
         <div className="w-screen h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex overflow-hidden">
-          <SideBar currentUser={currentUser} />
-          <SearchUsers setFriends={setFriends} />
+           <SideBar currentUser={currentUser} />
+           <SearchUsers setFriends={setFriends} />
 
-          {openNoti && (
-            <NotificationList
-              messageList={unreadMessageList}
-              handleMessageClick={handleMessageClick}
-              handleNotification={handleNotification}
-            />
-          )}
+           {openNoti && (
+             <NotificationList
+               messageList={unreadMessageList}
+               handleMessageClick={handleMessageClick}
+               handleNotification={handleNotification}
+             />
+           )}
 
-          <div className="hidden lg:flex w-full h-screen z-0 gap-0">
-            <FriendList
-              friends={friends}
-              theme={theme}
-              handleClickedUser={handleClickedUser}
-              changeTheme={changeTheme}
-              handleNotification={handleNotification}
-              currentUser={currentUser}
-            />
-            <ChatBox
-              currentUser={currentUser}
-              unreadMessagesHandler={addNewUnreadMessage}
-              clickedUser={clickedUser}
-            />
-          </div>
+           <div className="hidden lg:flex flex-1 h-screen z-0 gap-0 min-w-0">
+             <FriendList
+               friends={friends}
+               theme={theme}
+               handleClickedUser={handleClickedUser}
+               changeTheme={changeTheme}
+               handleNotification={handleNotification}
+               currentUser={currentUser}
+             />
+             <ChatBox
+               currentUser={currentUser}
+               unreadMessagesHandler={addNewUnreadMessage}
+               clickedUser={clickedUser}
+             />
+           </div>
 
           <div className="lg:hidden flex w-full h-full relative">
             {isBack ? (

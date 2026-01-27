@@ -1,7 +1,7 @@
 "use client";
 
-import { IoSearchSharp } from "react-icons/io5";
-import { FaUserSlash } from "react-icons/fa6";
+import { Search, Users } from "lucide-react";
+import { Button } from "@components/ui/button";
 
 import ProfileCard from "@components/ProfileCard";
 import FriendCard from "@components/FriendCard";
@@ -16,7 +16,8 @@ const FriendList = ({
   changeBack,
 }) => {
   return (
-    <div className="left-side">
+    <div className="flex-[0.25] bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700 flex flex-col h-full min-w-0">
+      {/* Header with Profile Card */}
       <div>
         <ProfileCard
           theme={theme}
@@ -26,21 +27,23 @@ const FriendList = ({
         />
       </div>
 
-      <div className="bg-[var(--box-color-3)] px-[13px] py-[10px] flex-center">
-        <button
+      {/* Search Button */}
+      <div className="border-b border-slate-700 bg-slate-800/50 backdrop-blur px-4 py-3">
+        <Button
           onClick={() => {
             document
               .getElementById("search_container")
               .classList.replace("hidden", "fixed");
           }}
-          className="w-full py-1 bg-[var(--box-color)] border border-transparent flex-center gap-2 hover:bg-[var(--box-color-2)] hover:border-[var(--box-color)] rounded-sm"
+          className="w-full bg-slate-700 hover:bg-slate-600 text-slate-100 gap-2 justify-center"
         >
-          <IoSearchSharp />
-          <p>Find new friends</p>
-        </button>
+          <Search className="h-4 w-4" />
+          Find new friends
+        </Button>
       </div>
 
-      <div className="h-full overflow-y-auto">
+      {/* Friends List */}
+      <div className="flex-1 overflow-y-auto">
         {friends.length > 0 ? (
           friends.map((friend, index) => (
             <div
@@ -51,16 +54,17 @@ const FriendList = ({
                   changeBack();
                 }
               }}
+              className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors cursor-pointer"
             >
               <FriendCard user={friend} />
-              <hr />
             </div>
           ))
         ) : (
-          <div className="h-full flex-center">
-            <div className="flex-column items-center">
-              <FaUserSlash size={100} />
-              <h2>No Friends found</h2>
+          <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-4">
+            <Users className="h-16 w-16 opacity-50" />
+            <div className="text-center">
+              <p className="text-lg font-medium">No friends yet</p>
+              <p className="text-sm">Use the search button to find and add friends</p>
             </div>
           </div>
         )}
