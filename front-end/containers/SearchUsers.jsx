@@ -18,7 +18,7 @@ const SearchUsers = ({ setFriends }) => {
       try {
          const { getAuthHeader } = await import('@utils/tokenManager');
          const response = await fetch(
-           `${process.env.NEXT_PUBLIC_API_URL}/api/search/user/${search}`,
+           `${process.env.NEXT_PUBLIC_API_URL}/api/search/username/${search}`,
            {
              headers: getAuthHeader(),
            },
