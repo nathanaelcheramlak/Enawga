@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MdSend } from 'react-icons/md';
-import { FaCloud } from 'react-icons/fa6';
+import { Send, MessageCircle, ArrowLeft } from 'lucide-react';
+import { Button } from '@components/ui/button';
+import { Input } from '@components/ui/input';
 
 import ProfileCard from '@components/ProfileCard';
 import ChatBubble from '@components/ChatBubble';
@@ -142,43 +143,77 @@ const ChatBox = ({
   });
 
   return (
-    <div className="right-side justify-between relative">
+    <div className="right-side justify-between relative flex flex-col bg-slate-900">
       {clickedUser ? (
-        <div className="flex-column w-full h-full justify-between">
-          <div>
-            <ProfileCard user={clickedUser} changeBack={changeBack} />
+        <>
+          {/* Header */}
+          <div className="border-b border-slate-700 bg-slate-800/50 backdrop-blur">
+            <div className="px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {changeBack && (
+                  <button
+                    onClick={changeBack}
+                    className="lg:hidden p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                  >
+                    <ArrowLeft className="h-5 w-5 text-slate-300" />
+                  </button>
+                )}
+                <div>
+                  <h3 className="font-semibold text-white text-lg">
+                    {clickedUser.username}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {clickedUser.bio || 'No bio'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="flex-column overflow-y-auto snap-y snap-mandatory flex-grow">
-            <div className="px-4 py-6 flex-column gap-5" ref={chatContainerRef}>
-              {messages.map((msg, index) => (
+          {/* Messages Container */}
+          <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-6" ref={chatContainerRef}>
+            {messages.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+                <MessageCircle className="h-12 w-12 mb-3 opacity-50" />
+                <p className="text-sm">No messages yet. Start a conversation!</p>
+              </div>
+            ) : (
+              messages.map((msg, index) => (
                 <ChatBubble
                   key={index}
                   message={msg.message}
                   createdAt={msg.createdAt}
                   session={msg.session}
                 />
-              ))}
+              ))
+            )}
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-slate-700 bg-slate-800/50 backdrop-blur p-4">
+            <div className="flex gap-3 items-end">
+              <Input
+                placeholder="Type a message..."
+                value={textValue}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500 rounded-lg h-10"
+              />
+              <Button
+                onClick={sendMessage}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-10"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-          <div className="px-[16px] py-[16px] bg-[var(--box-color-2)] flex-between align-bottom">
-            <InputCard
-              placeHolder="Text Message"
-              inputChange={handleChange}
-              inputValue={textValue}
-              onKeyDown={handleKeyDown}
-            />
-            <i onClick={sendMessage}>
-              <MdSend size={25} />
-            </i>
-          </div>
-        </div>
+        </>
       ) : (
-        <div className="h-full w-full flex-center">
-          <div className="flex-column items-center">
-            <FaCloud size={100} />
-            <h2>No user selected</h2>
-          </div>
+        <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+          <MessageCircle className="h-20 w-20 mb-4 opacity-30" />
+          <h2 className="text-xl font-semibold mb-2">No chat selected</h2>
+          <p className="text-sm">Select a user from your friends list to start chatting</p>
         </div>
       )}
     </div>
