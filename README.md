@@ -37,36 +37,23 @@ This project is a real-time chat application designed to enable users to join va
 
 ## Environment Variables
 
-### Backend Setup
+### Local Development
 
-Create a `.env` file in the `backend/` directory for local development:
+Environment files are pre-configured for local development:
 
-```env
-PORT=5000
-MONGODB_URI=<your_mongodb_cluster_uri>
-JWT_SECRET=<your_jwt_secret>
-NODE_ENV=development
-CLIENT_ID=<your_google_client_id>
-GOOGLE_SECRET=<your_google_secret>
-FRONTEND_URL=http://localhost:3000
-```
+- **Backend:** `backend/.env` - Update placeholder values with your MongoDB URI, JWT secret, and Google OAuth credentials
+- **Frontend:** `front-end/.env.local` - Already set to connect to `http://localhost:5000`
 
-For production on Render, set the `FRONTEND_URL` environment variable in your Render dashboard:
+### Production Deployment
 
+**Render (Backend):**
+Set environment variables in your Render dashboard, including:
 ```env
 FRONTEND_URL=https://enawga.vercel.app
 ```
 
-### Frontend Setup
-
-Create a `.env.local` file in the `front-end/` directory for local development:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
-```
-
-For production on Vercel, update `.env.production` in `front-end/` with your Render backend URL:
-
+**Vercel (Frontend):**
+Update `front-end/.env.production` with your Render backend URL:
 ```env
 NEXT_PUBLIC_API_URL=https://enawga-backend.onrender.com
 ```
