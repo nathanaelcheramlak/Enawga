@@ -1,7 +1,7 @@
 import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import generateTokenAndSetCookie from '../utils/generateToken.js';
+import generateToken from '../utils/generateToken.js';
 import { v4 as uuid4 } from 'uuid';
 
 export const signUp = async (req, res) => {
@@ -45,13 +45,14 @@ export const signUp = async (req, res) => {
 
     await newUser.save();
 
-    generateTokenAndSetCookie(newUser._id, res, '1h');
+    const token = generateToken(newUser._id, '1h');
 
     res.status(201).json({
       _id: newUser._id,
       fullName: newUser.fullName,
       username: newUser.username,
       profilePic: newUser.profilePic,
+      token,
     });
   } catch (error) {
     console.error('Error signing up controller:', error.message);
@@ -90,17 +91,9 @@ export const googleLogin = async (req, res) => {
     }
 
     const tokenExpiration = '4h';
-    generateTokenAndSetCookie(user._id, res, tokenExpiration);
+    const token = generateToken(user._id, tokenExpiration);
 
-    // res.status(200).json({
-    //   _id: user._id,
-    //   fullName: user.fullName,
-    //   username: user.username,
-    //   email: user.email,
-    //   profilePic: user.profilePic,
-    //   bio: user.bio,
-    // });
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/home`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/home?token=${token}`);
   } catch (error) {
     console.error('Error in google login controller:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -121,7 +114,7 @@ export const login = async (req, res) => {
     }
 
     const tokenExpiration = rememberMe ? '7d' : '1h';
-    generateTokenAndSetCookie(user._id, res, tokenExpiration);
+    const token = generateToken(user._id, tokenExpiration);
 
     res.status(200).json({
       _id: user._id,
@@ -130,6 +123,7 @@ export const login = async (req, res) => {
       email: user.email,
       profilePic: user.profilePic,
       bio: user.bio,
+      token,
     });
   } catch (error) {
     console.error('Error in login controller:', error.message);
@@ -139,11 +133,6 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.cookie('jwt', '', {
-      maxAge: 0,
-      sameSite: 'lax',
-      httpOnly: true,
-    });
     res.status(200).json({ message: 'Logged out successfully' });
   } catch (error) {
     console.error('Error Logout controller:', error.message);
@@ -153,12 +142,12 @@ export const logout = async (req, res) => {
 
 export const verifyToken = async (req, res) => {
   try {
-    const token = req.cookies['jwt'];
-    if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    // Verify the token
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId).select(
       '_id fullName username email profilePic bio',

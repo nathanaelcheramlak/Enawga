@@ -10,6 +10,7 @@ import { Button } from '@components/ui/button';
 import { Checkbox } from '@components/ui/checkbox';
 import { Alert, AlertDescription } from '@components/ui/alert';
 import { useAuthCheck } from '@hooks/useAuthCheck';
+import { saveToken } from '@utils/tokenManager';
 
 const Login = () => {
    const router = useRouter();
@@ -47,7 +48,6 @@ const Login = () => {
              'Content-Type': 'application/json',
            },
            body: JSON.stringify({ username, password }),
-           credentials: 'include',
          },
        );
 
@@ -56,6 +56,10 @@ const Login = () => {
          throw new Error(errorData.message || 'Login failed. Please check your credentials.');
        }
 
+       const data = await response.json();
+       if (data.token) {
+         saveToken(data.token);
+       }
        router.push('/home');
      } catch (error) {
        setError(error.message);

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Input } from '@components/ui/input';
 import { Button } from '@components/ui/button';
 import { Alert, AlertDescription } from '@components/ui/alert';
+import { saveToken, getAuthHeader } from '@utils/tokenManager';
 
 const Signup = () => {
   const [info, setInfo] = useState({
@@ -30,7 +31,7 @@ const Signup = () => {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify?timestamp=${new Date().getTime()}`,
           {
-            credentials: 'include',
+            headers: getAuthHeader(),
           }
         );
 
@@ -88,14 +89,14 @@ const Signup = () => {
           password: info.password,
           confirmPassword: info.confirmPassword,
         }),
-        credentials: 'include',
       });
       if (!response.ok) {
         setIsLoading(false);
         throw new Error('Signup failed. Something went wrong.');
       }
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data.token) {
+        saveToken(data.token);
         router.push('/home');
       }
       setIsLoading(false);

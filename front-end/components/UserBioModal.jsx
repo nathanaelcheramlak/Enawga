@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { Button } from "@components/ui/button";
 import { Card } from "@components/ui/card";
+import { getAuthHeader } from "@utils/tokenManager";
 import DefaultProfile from "@public/assets/default-profile-image.jpg";
 
 const UserBioModal = ({ user, isOpen, onClose }) => {
@@ -19,7 +20,7 @@ const UserBioModal = ({ user, isOpen, onClose }) => {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/search/user/${user._id}`,
             {
-              credentials: "include",
+              headers: getAuthHeader(),
             }
           );
 

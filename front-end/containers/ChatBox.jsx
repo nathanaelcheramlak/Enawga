@@ -44,19 +44,20 @@ const ChatBox = ({
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/send/${clickedUser._id}`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message_content: theTextValue,
-          }),
-        },
-      );
+       const { getAuthHeader } = await import('@utils/tokenManager');
+       const response = await fetch(
+         `${process.env.NEXT_PUBLIC_API_URL}/api/messages/send/${clickedUser._id}`,
+         {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             ...getAuthHeader(),
+           },
+           body: JSON.stringify({
+             message_content: theTextValue,
+           }),
+         },
+       );
 
       if (!response.ok) {
         console.log('Failed to send new message');
@@ -110,10 +111,11 @@ const ChatBox = ({
       // Helper: load all the coversation from the db
       const fetchConverstaion = async () => {
         try {
+          const { getAuthHeader } = await import('@utils/tokenManager');
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/messages/user/${clickedUser._id}`,
             {
-              credentials: 'include',
+              headers: getAuthHeader(),
             },
           );
 

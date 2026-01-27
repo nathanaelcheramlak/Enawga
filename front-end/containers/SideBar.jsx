@@ -7,6 +7,7 @@ import { X, LogOut, Edit3, ChevronLeft } from 'lucide-react';
 import { Button } from '@components/ui/button';
 import { Card } from '@components/ui/card';
 import { sleep } from '@utils/commonFunctions';
+import { removeToken } from '@utils/tokenManager';
 import DefaultProfile from '@public/assets/default-profile-image.jpg';
 
 const SideBar = ({ currentUser }) => {
@@ -39,13 +40,13 @@ const SideBar = ({ currentUser }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
         method: 'DELETE',
-        credentials: 'include',
       });
       if (!response.ok) {
         console.log('Logout Failed!');
         return;
       }
 
+      removeToken();
       sleep(500);
       document.getElementById('loading-body').classList.add('loading-body');
       document
@@ -60,7 +61,7 @@ const SideBar = ({ currentUser }) => {
     } catch (error) {
       console.log(error);
     }
-  };
+   };
 
   return (
     <div

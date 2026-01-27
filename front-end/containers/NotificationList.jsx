@@ -5,6 +5,7 @@ import { X, MessageCircle, Loader2 } from "lucide-react";
 import { Button } from "@components/ui/button";
 
 import { formatTime } from "@utils/commonFunctions";
+import { getAuthHeader } from "@utils/tokenManager";
 
 const NotificationList = ({ handleNotification, handleMessageClick }) => {
   const [messageList, setMessageList] = useState([]);
@@ -13,9 +14,9 @@ const NotificationList = ({ handleNotification, handleMessageClick }) => {
   useEffect(() => {
     const fetchUnreadMessages = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/unread`, {
-          credentials: "include",
-        });
+         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/unread`, {
+           headers: getAuthHeader(),
+         });
 
         if (!response.ok) {
           console.error("Failed to fetch unread messages");
@@ -43,11 +44,11 @@ const NotificationList = ({ handleNotification, handleMessageClick }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          ...getAuthHeader(),
         },
         body: JSON.stringify({
           senderId: message.senderId._id,
         }),
-        credentials: "include",
       });
 
       // Remove from notification list

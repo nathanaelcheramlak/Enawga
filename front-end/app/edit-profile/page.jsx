@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@components/ui/button';
 import { Input } from '@components/ui/input';
 import { Card } from '@components/ui/card';
+import { getAuthHeader } from '@utils/tokenManager';
 import DefaultProfile from '@public/assets/default-profile-image.jpg';
 
 const EditProfile = () => {
@@ -36,11 +37,11 @@ const EditProfile = () => {
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify?timestamp=${new Date().getTime()}`,
-          {
-            withCredentials: true,
-          },
-        );
+           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify?timestamp=${new Date().getTime()}`,
+           {
+             headers: getAuthHeader(),
+           },
+         );
         if (response.status === 200) {
           const data = response.data;
           setInfo(data.user);
@@ -76,12 +77,12 @@ const EditProfile = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...getAuthHeader(),
         },
         body: JSON.stringify({
           fullName: info.fullName,
           bio: info.bio,
         }),
-        credentials: 'include',
       });
       if (!response.ok) {
         const errorText = await response.text();

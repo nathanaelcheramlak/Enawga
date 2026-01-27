@@ -16,12 +16,13 @@ const SearchUsers = ({ setFriends }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/search/user/${search}`,
-          {
-            credentials: 'include',
-          },
-        );
+         const { getAuthHeader } = await import('@utils/tokenManager');
+         const response = await fetch(
+           `${process.env.NEXT_PUBLIC_API_URL}/api/search/user/${search}`,
+           {
+             headers: getAuthHeader(),
+           },
+         );
 
         if (!response.ok) {
           console.log('Failed to fetch users');
@@ -46,13 +47,14 @@ const SearchUsers = ({ setFriends }) => {
       document
         .getElementById('loading-spinner')
         .classList.add('loading-spinner');
+      const { getAuthHeader } = await import('@utils/tokenManager');
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/messages/send/${user._id}`,
         {
           method: 'POST',
-          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
+            ...getAuthHeader(),
           },
           body: JSON.stringify({
             message_content: 'You have started chatting.',

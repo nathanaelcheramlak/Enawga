@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 import { formatTime } from "@utils/commonFunctions";
+import { getAuthHeader } from "@utils/tokenManager";
 import DefaultProfile from "@public/assets/default-profile-image.jpg";
 import UserBioModal from "./UserBioModal";
 import { initializeSocket } from "@utils/socket";
@@ -17,11 +18,11 @@ const FriendCard = ({ user, currentUserId }) => {
     const fetchLastMessage = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/messages/user/${user._id}`,
-          {
-            credentials: "include",
-          }
-        );
+            `${process.env.NEXT_PUBLIC_API_URL}/api/messages/user/${user._id}`,
+            {
+              headers: getAuthHeader(),
+            }
+          );
 
         if (response.ok) {
           const messages = await response.json();

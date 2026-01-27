@@ -1,3 +1,5 @@
+import { getAuthHeader } from './tokenManager';
+
 export const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -21,7 +23,7 @@ export const formatTime = (time) => {
 export const fetchFriends = async (setFriends) => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
-      credentials: 'include',
+      headers: getAuthHeader(),
     });
 
     if (!response.ok) {

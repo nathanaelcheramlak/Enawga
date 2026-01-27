@@ -3,8 +3,16 @@ import User from '../models/user.model.js';
 
 const protectRoute = async (req, res, next) => {
   try {
-    // Verify if the send is authorized.
-    const token = req.cookies.jwt;
+    // Get token from either cookies (legacy) or Authorization header (Bearer token)
+    let token = req.cookies.jwt;
+    
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      }
+    }
+
     if (!token) {
       return res
         .status(401)
