@@ -1,10 +1,12 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { Search, Users } from "lucide-react";
 import { Button } from "@components/ui/button";
 
 import ProfileCard from "@components/ProfileCard";
 import FriendCard from "@components/FriendCard";
+import { initializeSocket, disconnectSocket } from "../utils/socket.js";
 
 const FriendList = ({
    friends,
@@ -16,6 +18,67 @@ const FriendList = ({
    changeBack,
    unreadCount,
  }) => {
+  const [friendsList, setFriendsList] = useState(friends);
+  const socket = useRef(initializeSocket(currentUser?._id));
+
+  // Hook: Listen for real-time updates
+  useEffect(() => {
+    const currentSocket = socket.current;
+
+    currentSocket.on("connect", () => {
+      console.log("Connected to socket server");
+    });
+
+    // Listen for new incoming messages to update friend order
+    currentSocket.on("newIncomingMessage", (message) => {
+      setFriendsList((prevFriends) => {
+        // Check if sender is already in friends list
+        const senderExists = prevFriends.some(
+          (friend) => friend._id === message.senderId
+        );
+
+        // If sender exists, update the friend's last message
+        if (senderExists) {
+          return prevFriends.map((friend) =>
+            friend._id === message.senderId
+              ? {
+                  ...friend,
+                  lastMessage: message.message_content,
+                  updatedAt: message.createdAt,
+                }
+              : friend
+          );
+        }
+
+        return prevFriends;
+      });
+    });
+
+    // Listen for new conversation creation
+    currentSocket.on("newConversation", (newFriend) => {
+      setFriendsList((prevFriends) => {
+        // Avoid duplicates
+        const friendExists = prevFriends.some(
+          (friend) => friend._id === newFriend._id
+        );
+        if (!friendExists) {
+          return [newFriend, ...prevFriends];
+        }
+        return prevFriends;
+      });
+    });
+
+    return () => {
+      currentSocket.off("newIncomingMessage");
+      currentSocket.off("newConversation");
+    };
+  }, [currentUser?._id]);
+
+  // Sync parent friends with local state
+  useEffect(() => {
+    setFriendsList(friends);
+  }, [friends]);
+
   return (
     <div className="flex-[0.25] bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700 flex flex-col h-full min-w-0">
       {/* Header with Profile Card */}
@@ -46,10 +109,10 @@ const FriendList = ({
 
       {/* Friends List */}
       <div className="flex-1 overflow-y-auto">
-        {friends.length > 0 ? (
-          friends.map((friend, index) => (
+        {friendsList.length > 0 ? (
+          friendsList.map((friend, index) => (
             <div
-              key={index}
+              key={friend._id || index}
               onClick={() => {
                 handleClickedUser(friend);
                 if (changeBack) {
